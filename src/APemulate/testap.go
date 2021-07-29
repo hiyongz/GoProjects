@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 	"strings"
@@ -26,7 +27,7 @@ func main() {
 		fmt.Println("connect successful")
 	}
 
-	var outBuf = make([]byte, 16+encLen)
+	var outBuf = make([]byte, 30)
 	outBuf[0] = 0x24
 	outBuf[1] = 0x0
 	outBuf[2] = 0x6
@@ -38,7 +39,14 @@ func main() {
 
 	fmt.Println(conn.LocalAddr().String() + " : Client connected!")
 	
-	defer conn.Close() // 关闭连接
+	// defer conn.Close() // 关闭连接
+
+	_, err = conn.Write([]byte(outBuf)) // 发送数据
+	chkError(err)
+
+	result,err := ioutil.ReadAll(conn)
+	chkError(err)
+	fmt.Println(result)
 	
 	inputReader := bufio.NewReader(os.Stdin)
 	for {
