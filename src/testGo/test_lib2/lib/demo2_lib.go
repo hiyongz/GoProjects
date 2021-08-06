@@ -1,5 +1,5 @@
 
-package lib2
+package lib
 
 import "fmt"
 

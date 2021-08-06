@@ -1,8 +1,11 @@
 
 package main
 
+
+
 import (
   "flag"
+  "testGo/test_lib2/lib"
 )
 
 var name string
@@ -13,5 +16,5 @@ func init() {
 
 func main() {
   flag.Parse()
-  hello(name)
+  lib.hello(name)
 }
