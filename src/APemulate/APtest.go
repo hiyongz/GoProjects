@@ -176,43 +176,6 @@ func AddVirtualNetworkCard(apNum int)  {
 	}
 }
 
-func AddVirtualNetworkCard2(apNum int)  {
-	ids := apNum / 200
-	remain := apNum % 200
-	for i := 0; i <= ids; i ++ {
-		var times int
-		if i != ids {
-			times = 201
-		}else {
-			times = remain
-			if remain == 0 {
-				return
-			}
-		}
-
-		for j := 2; j <= times + 1; j++ {
-			tempIp := ipAddrPre[i] + strconv.Itoa(j)
-			interfaceName := fmt.Sprintf("%s:%d", *netInterface,i * 200 + j - 1)
-			//log.Println(tempAddr)
-			msg := fmt.Sprintf("ifconfig %s %s netmask 255.255.0.0 up", interfaceName, tempIp)
-			log.Println(msg)
-			exeSysCommand(msg)
-			ap := &ApDevData{
-				Ip: tempIp,
-				Mac: "",
-				InterfaceName: interfaceName,
-				Index: i * 200 + j - 1,
-				Manager: "",
-				Key: "",
-				//body: []byte(""),
-			}
-
-			devArray[i * 200 + j - 1] = ap
-			//ipArray = append(ipArray, tempAddr)
-		}
-	}
-}
-
 func FindDevByMac(mac string) *ApDevData {
 	for _, info := range devArray {
 		if info.Mac == mac {
@@ -664,6 +627,34 @@ func StartUdpProcess()  {
 	}
 }
 
+
+func StartEncryptProcess() {
+	log.Println("=================================")
+	_, err := net.InterfaceByName(*netInterface)
+	if err != nil {
+		log.Println("bind interface error. ", err)
+		os.Exit(-1)
+	}
+	// tcpAddr, _ := net.ResolveTCPAddr("tcp","ims.ip-com.com.cn:11822") // 获取一个TCPAddr
+	// tcpAddr, _ := net.ResolveTCPAddr("tcp","47.98.176.85:11822") // 获取一个TCPAddr
+	tcpAddr, _ := net.ResolveTCPAddr("tcp", "118.31.2.168:1821") // 获取一个TCPAddr
+	fmt.Println("tcpAddr: ", tcpAddr)
+	conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	if err != nil {
+		fmt.Println("err :", err)
+		return
+	} else {
+		fmt.Println("connect successful")
+		fmt.Println(conn.LocalAddr().String() + " : Client connected!")
+	}
+
+
+}
+
+
+
+
+
 func Traverse(apNum int) {
 	ids := apNum / 200
 	remain := apNum % 200
@@ -712,13 +703,17 @@ func InitWebListen() {
 
 func main()  {
 
-	netInterface = flag.String("i", "etn0", "net interface name")
+	netInterface = flag.String("i", "eth1", "net interface name")
 	apNum = flag.Int("n", 1000, "ap numbers")
 	flag.Parse()
 
 	AddVirtualNetworkCard(*apNum)
 	InitWebListen()
 	DumpNetInterfaces()
+
+	StartEncryptProcess()
+	Send_cmd_dev_auth_k
+
 	go StartUdpProcess()
 	//Traverse(*apNum)
 	for {
