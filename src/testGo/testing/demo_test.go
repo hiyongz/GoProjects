@@ -43,3 +43,9 @@ func testIntroduce(t *testing.T) { // 请注意这个测试函数的名称。
 	}
 	t.Logf("The expected introduce is %q.\n", expected)
 }
+
+func TestFail(t *testing.T) {
+	//t.Fail()
+	t.FailNow() // 此调用会让当前的测试立即失败。
+	t.Log("Failed.")
+}
