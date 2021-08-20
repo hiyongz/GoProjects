@@ -8,11 +8,13 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
 )
 
 var allocate_server = "118.31.2.168:1821"
 var dev_server = "47.98.176.85:11822"
 var mac = "D8380DDBCE90"
+var mac2 = "d8:38:0d:db:ce:90"
 var version = "V2.0.0.7(7924)"
 var pruduct = "W36AP"
 var company = "IP-COM"
@@ -161,7 +163,8 @@ func cmd_dev_encrypt_q(conn *net.TCPConn) {
 	oneMessage = append(oneMessage, byte(len(pruduct)))
 	oneMessage = append(oneMessage, pruduct_uint8...)
 
-	fmt.Printf("data: %x\n", oneMessage)
+	// log.Printf("data: %x\n", oneMessage)
+	log.Println("CMD_DEV_ENCRYPT_Q")
 
 	// // defer conn.Close() // 关闭连接
 	_, err := conn.Write([]byte(oneMessage)) // 发送数据
@@ -171,7 +174,6 @@ func cmd_dev_encrypt_q(conn *net.TCPConn) {
 func cmd_dev_encrypt_a(conn *net.TCPConn) (header []byte) {
 	// 接收服务器对设备端发起的认证响应数据
 	header = make([]byte, 52)
-Loop:
 	for {
 		// deHead := make([]byte, 52)
 		// log.Println(fmt.Sprintf("recv header : %x", header))
@@ -179,9 +181,9 @@ Loop:
 		if err != nil {
 			log.Println("recv failed. ", err)
 		} else {
-			log.Println(fmt.Sprintf("cmd_dev_encrypt_a : %x", header))
-			log.Println(header)
-			break Loop
+			// log.Println(fmt.Sprintf("cmd_dev_encrypt_a : %x", header))
+			log.Println("CMD_DEV_ENCRYPT_A")
+			break
 
 		}
 	}
@@ -202,7 +204,8 @@ func cmd_dev_encrypt_k(conn *net.TCPConn, md5 []byte) {
 		tmpmsg = append(tmpmsg, md5[index])
 	}
 
-	fmt.Printf("tmpmsg: %x\n", tmpmsg)
+	// fmt.Printf("tmpmsg: %x\n", tmpmsg)
+	log.Println("CMD_DEV_ENCRYPT_K")
 	_, err := conn.Write([]byte(tmpmsg)) // 发送数据
 	chkError(err)
 
@@ -211,19 +214,19 @@ func cmd_dev_encrypt_k(conn *net.TCPConn, md5 []byte) {
 func cmd_dev_encrypt_l(conn *net.TCPConn) {
 	// 服务器发给设备端，告诉设备端授权认证成功。
 	header2 := make([]byte, 45)
-	Loop2:
-		for {
-			// deHead := make([]byte, 52)
-			_, err2 := io.ReadFull(conn, header2[:])
-			if err2 != nil {
-				log.Println("recv failed. ", err2)
-			}
-	
-			if header2[0] != 0 {
-				log.Println(fmt.Sprintf("recv header : %x", header2))
-				break Loop2
-			}
+	for {
+		// deHead := make([]byte, 52)
+		_, err2 := io.ReadFull(conn, header2[:])
+		if err2 != nil {
+			log.Println("recv failed. ", err2)
 		}
+
+		if header2[0] != 0 {
+			// log.Println(fmt.Sprintf("recv header : %x", header2))
+			log.Println("CMD_DEV_ENCRYPT_L")
+			break
+		}
+	}
 }
 
 func cmd_dev_allocate_sn_q(conn *net.TCPConn) {
@@ -240,7 +243,8 @@ func cmd_dev_allocate_sn_q(conn *net.TCPConn) {
 	allocate_sn_msg = append(allocate_sn_msg, byte(len(pruduct)))
 	pruduct_uint8 = []byte(pruduct)
 	allocate_sn_msg = append(allocate_sn_msg, pruduct_uint8...)
-	log.Printf("allocate_sn_msg: %02x\n", allocate_sn_msg)
+	// log.Printf("allocate_sn_msg: %02x\n", allocate_sn_msg)
+	log.Println("CMD_DEV_ALLOCATE_SN_Q")
 
 	_, err := conn.Write([]byte(allocate_sn_msg)) // 发送数据
 	chkError(err)
@@ -249,7 +253,6 @@ func cmd_dev_allocate_sn_q(conn *net.TCPConn) {
 func cmd_dev_allocate_sn_a(conn *net.TCPConn) (allocate_sn_data []byte){
 	//  CMD_DEV_ALLOCATE_SN_A ：服务器发送分配的sn给设备。
 	allocate_sn_data = make([]byte, 42)
-Loop3:
 	for {
 		// deHead := make([]byte, 52)
 		_, err := io.ReadFull(conn, allocate_sn_data[:])
@@ -258,8 +261,12 @@ Loop3:
 		}
 
 		if allocate_sn_data[0] != 0 {
-			log.Println(fmt.Sprintf("recv SN : %x", allocate_sn_data))
-			break Loop3
+			sn := fmt.Sprintf("%s", allocate_sn_data)
+			if strings.Contains(sn, "IPCOM") {
+				// log.Println(fmt.Sprintf("recv SN : %s", sn))
+				log.Println("CMD_DEV_ALLOCATE_SN_A")
+				break
+			}
 		}
 
 	}
@@ -289,8 +296,8 @@ func cmd_dev_sn_auth_q(conn *net.TCPConn, sn []byte) {
 	sn_auth_msg = append(sn_auth_msg, byte(len(pruduct)))
 	sn_auth_msg = append(sn_auth_msg, pruduct_uint8...)
 
-	log.Printf("sn_auth_q_msg: % 02x\n", sn_auth_msg)
-
+	// log.Printf("sn_auth_q_msg: % 02x\n", sn_auth_msg)
+	log.Println("CMD_DEV_SN_AUTH_Q")
 	_, err := conn.Write([]byte(sn_auth_msg)) // 发送数据
 	chkError(err)
 }
@@ -298,7 +305,6 @@ func cmd_dev_sn_auth_q(conn *net.TCPConn, sn []byte) {
 func cmd_dev_sn_auth_a(conn *net.TCPConn) (sn_auth_randstr []byte) {
 	//  CMD_DEV_ALLOCATE_SN_A ：服务器发送分配的sn给设备。
 	sn_auth_randstr = make([]byte, 52)
-Loop4:
 	for {
 		_, err := io.ReadFull(conn, sn_auth_randstr[:])
 		if err != nil {
@@ -307,7 +313,8 @@ Loop4:
 
 		if sn_auth_randstr[0] != 0 {
 			// log.Println(fmt.Sprintf("recv sn auth randstr: % 02x", sn_auth_randstr))
-			break Loop4
+			log.Println("CMD_DEV_SN_AUTH_A")
+			break
 		}
 	}
 	return sn_auth_randstr
@@ -327,7 +334,8 @@ func cmd_dev_sn_auth_k(conn *net.TCPConn, md5 []byte) {
 		sn_auth_msg = append(sn_auth_msg, md5[index])
 	}
 
-	fmt.Printf("sn_auth_msg: %x\n", sn_auth_msg)
+	// fmt.Printf("sn_auth_msg: %x\n", sn_auth_msg)
+	log.Println("CMD_DEV_SN_AUTH_K")
 	_, err := conn.Write([]byte(sn_auth_msg)) // 发送数据
 	chkError(err)
 
@@ -337,19 +345,19 @@ func cmd_dev_sn_auth_k(conn *net.TCPConn, md5 []byte) {
 func cmd_dev_sn_auth_l(conn *net.TCPConn) {
 	// 服务器发给设备端，告诉设备端授权认证成功。
 	sn_auth_data := make([]byte, 45)
-	Loop:
-		for {
-			// deHead := make([]byte, 52)
-			_, err := io.ReadFull(conn, sn_auth_data[:])
-			if err != nil {
-				log.Println("recv failed. ", err)
-			}
-	
-			if sn_auth_data[0] != 0 {
-				log.Println(fmt.Sprintf("recv sn auth data : %x", sn_auth_data))
-				break Loop
-			}
+	for {
+		// deHead := make([]byte, 52)
+		_, err := io.ReadFull(conn, sn_auth_data[:])
+		if err != nil {
+			log.Println("recv failed. ", err)
 		}
+
+		if sn_auth_data[0] != 0 {
+			// log.Println(fmt.Sprintf("recv sn auth data : %x", sn_auth_data))
+			log.Println("CMD_DEV_SN_AUTH_L")
+			break
+		}
+	}
 }
 
 func cmd_where_server_q(conn *net.TCPConn) {
@@ -357,24 +365,25 @@ func cmd_where_server_q(conn *net.TCPConn) {
 	where_server_msg := []byte{0x24, 0x0, 0x06, 0x0, 0x0, 0xd1, 0x0, 0x0, 0x04, 0x0d, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}
 	_, err := conn.Write([]byte(where_server_msg)) // 发送数据
 	chkError(err)
+	log.Println("CMD_WHERE_SERVER_Q")
 }
 
 func cmd_where_server_a(conn *net.TCPConn) {
 // 服务器把设备服务器的位置回复给设备端
 	where_server_data := make([]byte, 30)
-	Loop:
-		for {
-			// deHead := make([]byte, 52)
-			_, err := io.ReadFull(conn, where_server_data[:])
-			if err != nil {
-				log.Println("recv failed. ", err)
-			}
-
-			if where_server_data[0] != 0 {
-				log.Println(fmt.Sprintf("recv where server data : %x", where_server_data))
-				break Loop
-			}
+	for {
+		// deHead := make([]byte, 52)
+		_, err := io.ReadFull(conn, where_server_data[:])
+		if err != nil {
+			log.Println("recv failed. ", err)
 		}
+
+		if where_server_data[0] != 0 {
+			// log.Println(fmt.Sprintf("recv where server data : %x", where_server_data))
+			log.Printf("CMD_WHERE_SERVER_A: %s", where_server_data)
+			break
+		}
+	}
 }
 
 func cmd_account_info_q(conn *net.TCPConn) {
@@ -400,27 +409,27 @@ func cmd_dev_cloud_id_a(conn *net.TCPConn) {
 	cloud_id_msg = append(cloud_id_msg, []byte(dev_url)...)
 	cloud_id_msg = append(cloud_id_msg, []byte{0x09,0x22,0x22,0x0a,0x7d}...)
 
-	fmt.Printf("cloud_id_msg: % 02x\n", cloud_id_msg)
+	// fmt.Printf("cloud_id_msg: % 02x\n", cloud_id_msg)
+	log.Printf("CMD_DEV_CLOUD_ID_A: %s", cloud_id_msg)
 	_, err := conn.Write([]byte(cloud_id_msg)) // 发送数据
 	chkError(err)
 }
 
 func cmd_dev_cloud_id_q(conn *net.TCPConn) {
 	cloud_id_data := make([]byte, 48)
-	Loop:
-		for {
-			// deHead := make([]byte, 52)
-			_, err := io.ReadFull(conn, cloud_id_data[:])
-			if err != nil {
-				log.Println("recv failed. ", err)
-
-			}
-
-			if cloud_id_data[0] != 0 {
-				log.Println(fmt.Sprintf("recv cloud bind data: %x", cloud_id_data))
-				break Loop
-			}
+	for {
+		// deHead := make([]byte, 52)
+		_, err := io.ReadFull(conn, cloud_id_data[:])
+		if err != nil {
+			log.Println("recv failed. ", err)
 		}
+
+		if cloud_id_data[0] != 0 {
+			// log.Println(fmt.Sprintf("recv cloud bind data: %x", cloud_id_data))
+			log.Printf("CMD_DEV_CLOUD_ID_Q: %s", cloud_id_data)
+			break
+		}
+	}
 }
 
 
@@ -465,28 +474,145 @@ func cmd_dev_cloud_bind_a(conn *net.TCPConn, sn []byte) {
 	cloud_bind_msg = append(cloud_bind_msg, []byte{0x22,0x0a,0x7d}...)
 	
 	
-	fmt.Printf("cloud_bind_msg: % 02x\n", cloud_bind_msg)
+	// fmt.Printf("cloud_bind_msg: % 02x\n", cloud_bind_msg)
+	log.Printf("CMD_DEV_CLOUD_BIND_A: %s", cloud_bind_msg)
 	_, err := conn.Write([]byte(cloud_bind_msg)) // 发送数据
 	chkError(err)	
 }
 
 
-// func cmd_dev_cloud_bind_q(conn *net.TCPConn) {
-// 	repeat_time_data := make([]byte, 47)
-// 	Loop:
-// 		for {
-// 			// deHead := make([]byte, 52)
-// 			_, err := io.ReadFull(conn, repeat_time_data[:])
-// 			if err != nil {
-// 				log.Println("recv failed. ", err)
-// 			}
+func cmd_dev_cloud_bind_q(conn *net.TCPConn, sn []byte) {
+	cloud_bind_data := make([]byte, 219)
+	for {
+		_, err := io.ReadFull(conn, cloud_bind_data)
+		if err != nil {
+			log.Println("recv failed. ", err)
+		}
 
-// 			if repeat_time_data[0] != 0 {
-// 				log.Println(fmt.Sprintf("recv repeat time data: %x", repeat_time_data))
-// 				break Loop
-// 			}
-// 		}
-// }
+		if cloud_bind_data[0] != 0 {
+			bind_data := fmt.Sprintf("%s", cloud_bind_data)
+			sn_asci := fmt.Sprintf("%s", sn)
+			if strings.Contains(bind_data, sn_asci) {
+				// log.Println(fmt.Sprintf("recv cloud bind data: %s", bind_data))
+				log.Printf("CMD_DEV_CLOUD_BIND_Q: %s", bind_data)
+				break
+			}
+		}
+	}
+}
+
+func cmd_dev_time_q(conn *net.TCPConn) {
+	// 服务器下发上报时间间隔及次数
+	dev_time_data := make([]byte, 47)
+	for {
+		_, err := io.ReadFull(conn, dev_time_data)
+		if err != nil {
+			log.Println("recv failed. ", err)
+		}
+
+		if dev_time_data[0] != 0 {
+			time_data := fmt.Sprintf("%s", dev_time_data)
+			if strings.Contains(time_data, "repeat_time") {
+				// log.Println(fmt.Sprintf("recv time value data: %s", time_data))
+				log.Printf("CMD_DEV_TIME_Q: %s", time_data)
+				break
+			}
+		}
+	}
+}
+
+func cmd_node_status_upload_devinfo(conn *net.TCPConn) {
+	// 维链
+	node_status_data := []byte{0x24, 0x0, 0x6, 0x0, 0x01, 0x5b, 0x0, 0x0, 0x03, 0x02, 0x0, 0x0, 0x0, 0x0, 0x02, 0x36}
+	
+	node_status_data = append(node_status_data, []byte(`{"dev_info":{"mode":"W36AP","soft_ver":"V2.0.0.7(7924)","mac":"d8:38:0d:db:ce:90","manage_ip":"192.168.5.237","hard_ver":"V2.0","manage_mode":2,"dev_type":"ap"},"run_status":{"cpu_info":5,"mem_info":82,"run_time":"184307","front_dev":{"ip":"","mac":"","self_port":"lan","sn":"","port":"lan"},"down_rate":"40.00","up_rate":"32.00","user_num":0},"ap_status":{"rf_rule":[{"channel":9,"bindwidth":20,"radioflag":9,"power":18,"rssi":-100,"radioenable":1}, {"channel":149,"bindwidth":80,"radioflag":0,"power":17,"rssi":-100,"radioenable":1}]},"user_list":[],"resp_code":0}`)...)
+
+	
+	// fmt.Printf("node status data: %s\n", node_status_data)
+	log.Println("CMD_NODE_STATUS_UPLOAD_DEVINFO")
+	
+	_, err := conn.Write([]byte(node_status_data)) // 发送数据
+	chkError(err)
+}
+
+func cmd_node_status_upload_wireless(conn *net.TCPConn) {
+	// 维链
+	node_status_data := []byte{0x24, 0x0, 0x6, 0x0, 0x01, 0x5d, 0x0, 0x0, 0x03, 0x06, 0x0, 0x0, 0x0, 0x0, 0x01, 0x14}
+	
+	node_status_data = append(node_status_data, []byte(`{"wireless":{"timestamp":0,"radio_optimiza_config":{"rf_rule":[{"channel":9,"power":18,"rssi":-90,"radioenable":1}, {"channel":149,"power":17,"rssi":-90,"radioenable":1}]}},"maint":{"close_reboot":0,"timestamp":0,"mainetmode":2,"cycle_restart":{"timeval":1440}},"resp_code":0}`)...)
+
+	
+	// fmt.Printf("node status data: %s\n", node_status_data)
+	log.Println("CMD_NODE_STATUS_UPLOAD_Wireless")
+	_, err := conn.Write([]byte(node_status_data)) // 发送数据
+	chkError(err)
+}
+
+
+
+func cmd_node_status_upload_syslog(conn *net.TCPConn) {
+	// 上报系统日志
+	node_status_data := []byte{0x24, 0x0, 0x6, 0x0, 0x01, 0x5e, 0x0, 0x0, 0x09, 0x24, 0x0, 0x0, 0x0, 0x0, 0x0c, 0xbd}
+	
+	node_status_data = append(node_status_data, []byte(`{"sys_log":[{"event":"DHCP_ACK received from  (192.168.5.1)","time":"2021-08-12 22:01:09","event_type":"LAN DHCP"}, {"event":"Get Client IP Address (192.168.5.236) ","time":"2021-08-12 22:01:09","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_DISCOVER ","time":"2021-08-13 08:42:18","event_type":"LAN DHCP"}, {"event":"DHCP_OFFER received from  (192.168.5.1)","time":"2021-08-13 08:42:22","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_REQUEST for (192.168.5.233)","time":"2021-08-13 08:42:22","event_type":"LAN DHCP"}, {"event":"DHCP_ACK received from  (192.168.5.1)","time":"2021-08-13 08:42:22","event_type":"LAN DHCP"}, {"event":"Get Client IP Address (192.168.5.233) ","time":"2021-08-13 08:42:22","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_DISCOVER ","time":"2021-08-13 09:01:24","event_type":"LAN DHCP"}, {"event":"DHCP_OFFER received from  (192.168.5.1)","time":"2021-08-13 09:01:27","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_REQUEST for (192.168.5.234)","time":"2021-08-13 09:01:27","event_type":"LAN DHCP"}, {"event":"DHCP_ACK received from  (192.168.5.1)","time":"2021-08-13 09:01:28","event_type":"LAN DHCP"}, {"event":"Get Client IP Address (192.168.5.234) ","time":"2021-08-13 09:01:30","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_DISCOVER ","time":"2021-08-13 09:54:27","event_type":"LAN DHCP"}, {"event":"DHCP_OFFER received from  (192.168.5.1)","time":"2021-08-13 09:54:31","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_REQUEST for (192.168.5.235)","time":"2021-08-13 09:54:31","event_type":"LAN DHCP"}, {"event":"DHCP_ACK received from  (192.168.5.1)","time":"2021-08-13 09:54:31","event_type":"LAN DHCP"}, {"event":"Get Client IP Address (192.168.5.235) ","time":"2021-08-13 09:54:31","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_DISCOVER ","time":"2021-08-13 16:39:38","event_type":"LAN DHCP"}, {"event":"DHCP_OFFER received from  (192.168.5.1)","time":"2021-08-13 16:39:41","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_REQUEST for (192.168.5.236)","time":"2021-08-13 16:39:41","event_type":"LAN DHCP"}, {"event":"DHCP_ACK received from  (192.168.5.1)","time":"2021-08-13 16:39:41","event_type":"LAN DHCP"}, {"event":"Get Client IP Address (192.168.5.236) ","time":"2021-08-13 16:39:43","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_DISCOVER ","time":"2021-08-13 17:23:13","event_type":"LAN DHCP"}, {"event":"DHCP_OFFER received from  (192.168.5.1)","time":"2021-08-13 17:23:17","event_type":"LAN DHCP"}, {"event":"Broadcasting DHCP_REQUEST for (192.168.5.237)","time":"2021-08-13 17:23:17","event_type":"LAN DHCP"}, {"event":"DHCP_ACK received from  (192.168.5.1)","time":"2021-08-13 17:23:17","event_type":"LAN DHCP"}, {"event":"Get Client IP Address (192.168.5.237) ","time":"2021-08-13 17:23:17","event_type":"LAN DHCP"}, {"event":"web 192.168.5.245 login","time":"2021-08-13 17:30:12","event_type":"System"}, {"event":" check network  success","time":"2021-08-13 17:32:32","event_type":"System"}, {"event":"Sync time success!","time":"2021-08-13 17:32:34","event_type":"System"}, {"event":"AP enter in discovery state.","time":"2021-08-13 17:32:34","event_type":"System"}, {"event":"Sync time success!","time":"2021-08-13 17:32:56","event_type":"System"}]}`)...)
+
+	// 拆分为3个包发送
+	block_size := 1404	
+	data_len := len(node_status_data)
+	block_num := data_len/block_size
+	// block_rem := data_len%block_size
+
+	log.Println("CMD_NODE_STATUS_UPLOAD_System")
+
+	for i := 0; i <= block_num; i++ {
+		var block_data []byte
+		if i < block_num {
+			block_data = node_status_data[block_size*i:block_size*(i+1)]
+		} else {
+			block_data = node_status_data[block_size*block_num:data_len]
+		}	
+
+		log.Printf("length of data %d: %d\n", i, len(block_data))
+		// fmt.Printf("block_data %d: %s\n", i, block_data)
+		
+		_, err := conn.Write([]byte(block_data)) // 发送数据
+		chkError(err)
+	}
+	// fmt.Printf("node status data: %s\n", node_status_data)
+	// fmt.Printf("node status data: %d\n", len(node_status_data))
+	
+
+}
+
+func MessageReceive(conn *net.TCPConn, info string) {
+	header := make([]byte, 10)
+	for {
+		_, err2 := io.ReadFull(conn, header[:])
+		if err2 != nil {
+			log.Println("recv failed. ", err2)
+		} else {
+			log.Println(info)
+			break
+		}
+	}
+}
+
+
+func keep_connection(conn *net.TCPConn) {
+	// 上传设备信息
+	for {
+		time.Sleep(15 * time.Second)
+
+		cmd_node_status_upload_devinfo(conn)
+
+		MessageReceive(conn, "dev info")
+
+		cmd_node_status_upload_wireless(conn)
+		MessageReceive(conn, "wireless info")
+
+	}
+
+}
 
 
 func main() {
@@ -575,14 +701,56 @@ func main() {
 	// 设备端sn认证成功
 	cmd_dev_sn_auth_l(conn)
 
-	cmd_dev_cloud_id_a(conn) // 发送cloud id、project_id
+	/* ************************** 设备接入请求 ******************************** */
+
+	cmd_dev_cloud_id_a(conn) // 发送cloud id、project_id 和 url
 
 	cmd_dev_cloud_id_q(conn) // 设备服务器回应
 
-	cmd_dev_cloud_bind_a(conn, sn) // 发送devType、devSn、devMesh、cloud id、mac、model
+	cmd_dev_cloud_bind_a(conn, sn) // 设备接入请求：发送devType、devSn、devMesh、cloud id、mac、model
 
-	// cmd_dev_cloud_bind_q(conn) // 设备服务器回应
+	// 登录IMS平台统一加入设备
+	// ............
 
-	time.Sleep(30 * time.Second)
+	cmd_dev_cloud_bind_q(conn, sn) // 等待设备服务器回应，同意加入后，服务器下发project_id
 
+	// cmd_dev_time_q(conn) // 服务器下发设备上报时间参数
+
+	
+	// 上传设备信息
+	cmd_node_status_upload_devinfo(conn) // 上传设备信息dev_info、设备运行状态run_status、ap状态ap_status和用户列表信息user_list
+
+
+
+	MessageReceive(conn, "########## 1. upload dev info success! ##########")
+
+	cmd_node_status_upload_wireless(conn) // 上传设备无线信息
+
+
+	MessageReceive(conn, "########## 2. upload wireless info success! ##########")
+
+	
+	cmd_node_status_upload_syslog(conn) // 上传系统日志
+
+	MessageReceive(conn, "########## 3. upload syslog success! ##########")
+
+	/* ************************** 维链 ******************************** */
+
+	keep_connection(conn)
+
+	// for {
+
+	// 	_, err := conn.Write([]byte(node_status_data)) // 发送数据
+	// 	chkError(err)
+	// 	time.Sleep(15 * time.Second)
+	// 	defer conn.Close()  // 关闭连接
+	// 	conn = connect_server(dev_server)
+	// }
+
+	
+
+	for {
+		time.Sleep(1 * time.Second)
+	}
+	
 }
