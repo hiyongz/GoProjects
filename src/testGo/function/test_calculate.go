@@ -7,7 +7,6 @@ import (
 
 type operate func(x, y int) int
 
-// 方案1。
 func calculate(x int, y int, op operate) (int, error) {
 	if op == nil {
 		return 0, errors.New("invalid operation")
@@ -15,35 +14,39 @@ func calculate(x int, y int, op operate) (int, error) {
 	return op(x, y), nil
 }
 
-// 方案2。
-type calculateFunc func(x int, y int) (int, error)
+func add(x, y int) int {
+	return x + y
+}
 
-func genCalculator(op operate) calculateFunc {
-	return func(x int, y int) (int, error) {
-		if op == nil {
-			return 0, errors.New("invalid operation")
-		}
-		return op(x, y), nil
-	}
+func sub(x, y int) int {
+	return x - y
+}
+
+func multiply(x, y int) int {
+	return x * y	
+}
+
+func divide(x, y int) int {
+	return x / y	
 }
 
 func main() {
-	// 方案1。
-	x, y := 12, 23
-	op := func(x, y int) int {
-		return x + y
-	}
-	result, err := calculate(x, y, op)
-	fmt.Printf("The result: %d (error: %v)\n",
-		result, err)
-	result, err = calculate(x, y, nil)
-	fmt.Printf("The result: %d (error: %v)\n",
-		result, err)
+	x, y := 36, 6
+	// op := func(x, y int) int {
+	// 	return x + y
+	// }
+	result, _ := calculate(x, y, add)
+	fmt.Println("The result: ",result)
 
-	// 方案2。
-	x, y = 56, 78
-	add := genCalculator(op)
-	result, err = add(x, y)
-	fmt.Printf("The result: %d (error: %v)\n",
-		result, err)
+	result, _ = calculate(x, y, sub)
+	fmt.Println("The result: ",result)
+
+	result, _ = calculate(x, y, multiply)
+	fmt.Println("The result: ",result)
+
+	result, _ = calculate(x, y, divide)
+	fmt.Println("The result: ",result)
+	
+	result, _ = calculate(x, y, nil)
+	fmt.Println("The result: ",result)	
 }
