@@ -36,5 +36,16 @@ func main() {
 	fmt.Println("value of slice1:  ",slice1)
 	fmt.Println("value of slice2:  ",slice2)
 
+	slice1 = []int{1, 2, 3}
+	slice3 := make([]int, len(slice1))
+	copy(slice3, slice1)
+	slice3[1] = 6
+	fmt.Printf("address of slice1: %p\n",&slice1)
+	fmt.Printf("address of slice3: %p\n",&slice3)
+	fmt.Println("value of slice1:  ",slice1)
+	fmt.Println("value of slice3:  ",slice3)
+
+
+
 }
 
