@@ -13,8 +13,8 @@ import (
 
 var allocate_server = "118.31.2.168:1821"
 var dev_server = "47.98.176.85:11822"
-var mac = "D8380DDBCE90"
-var mac2 = "d8:38:0d:db:ce:90"
+var mac = "D8380DDBCE80"
+var mac2 = "d8:38:0d:d8:ce:80"
 var version = "V2.0.0.7(7924)"
 var pruduct = "W36AP"
 var company = "IP-COM"
@@ -525,7 +525,7 @@ func cmd_node_status_upload_devinfo(conn *net.TCPConn) {
 	// 维链
 	node_status_data := []byte{0x24, 0x0, 0x6, 0x0, 0x01, 0x5b, 0x0, 0x0, 0x03, 0x02, 0x0, 0x0, 0x0, 0x0, 0x02, 0x36}
 	
-	node_status_data = append(node_status_data, []byte(`{"dev_info":{"mode":"W36AP","soft_ver":"V2.0.0.7(7924)","mac":"d8:38:0d:db:ce:90","manage_ip":"192.168.5.237","hard_ver":"V2.0","manage_mode":2,"dev_type":"ap"},"run_status":{"cpu_info":5,"mem_info":82,"run_time":"184307","front_dev":{"ip":"","mac":"","self_port":"lan","sn":"","port":"lan"},"down_rate":"40.00","up_rate":"32.00","user_num":0},"ap_status":{"rf_rule":[{"channel":9,"bindwidth":20,"radioflag":9,"power":18,"rssi":-100,"radioenable":1}, {"channel":149,"bindwidth":80,"radioflag":0,"power":17,"rssi":-100,"radioenable":1}]},"user_list":[],"resp_code":0}`)...)
+	node_status_data = append(node_status_data, []byte(`{"dev_info":{"mode":"W36AP","soft_ver":"V2.0.0.7(7924)","mac":"d8:38:0d:db:ce:80","manage_ip":"192.168.4.101","hard_ver":"V2.0","manage_mode":2,"dev_type":"ap"},"run_status":{"cpu_info":5,"mem_info":82,"run_time":"184307","front_dev":{"ip":"","mac":"","self_port":"lan","sn":"","port":"lan"},"down_rate":"40.00","up_rate":"32.00","user_num":0},"ap_status":{"rf_rule":[{"channel":9,"bindwidth":20,"radioflag":9,"power":18,"rssi":-100,"radioenable":1}, {"channel":149,"bindwidth":80,"radioflag":0,"power":17,"rssi":-100,"radioenable":1}]},"user_list":[],"resp_code":0}`)...)
 
 	
 	// fmt.Printf("node status data: %s\n", node_status_data)
@@ -745,9 +745,7 @@ func main() {
 	// 	time.Sleep(15 * time.Second)
 	// 	defer conn.Close()  // 关闭连接
 	// 	conn = connect_server(dev_server)
-	// }
-
-	
+	// }	
 
 	for {
 		time.Sleep(1 * time.Second)
