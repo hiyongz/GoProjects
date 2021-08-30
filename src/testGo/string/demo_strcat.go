@@ -3,36 +3,40 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"log"
-	"os/exec"
+	"strings"
 )
 
-func UpdateRandstr(tlvdata []byte) {
-	// 替换随机字符串
-	// randstr := tlvdata[16:]
-	var buffer bytes.Buffer
-	for index := range tlvdata {
-		hex_data := fmt.Sprintf("%02x", tlvdata[index])
-		if index == 0 {
-			buffer.WriteString("char buff[] = {")
-		}
-		buffer.WriteString("0x")
-		buffer.WriteString(hex_data)
+func DemoBytes() {
+	var buffer bytes.Buffer	
+	buffer.WriteString("hello ")		
+	buffer.WriteString("world !")
+	strs := buffer.String()
+	fmt.Println(strs)
+	fmt.Printf("%T",strs)
 
-		if index != len(tlvdata)-1 {
-			buffer.WriteString(",")
-		} else {
-			buffer.WriteString("};")
-		}
+}
 
+func DemoStrings() {
+	var builder1 strings.Builder
+	builder1.WriteString("hello")
+	builder1.WriteByte(' ')
+	builder1.WriteString("world !")
+	builder1.Write([]byte{'\n'})
+	fmt.Println(builder1.String())
+	fmt.Printf("%T",builder1.String())
+	// builder1.Reset()
+	// fmt.Println(builder1.String())
+
+	f1 := func(b strings.Builder) {
+		// b.WriteString("world !")
+		fmt.Println(b.String())
 	}
-	randstrs := buffer.String()
+	f1(builder1)
 
-	randstr_sed := fmt.Sprintf("s/char\\ buff\\[\\].*$/%s/", randstrs)
-	cmd_sed_randstr := fmt.Sprintf("sed -i '%s' dev_encrypt.c", randstr_sed)
-	log.Printf("cmd_sed: %s", cmd_sed_randstr)
-	_, err := exec.Command("bash", "-c", cmd_sed_randstr).Output()
-	if err != nil {
-		log.Fatalf("failed to update randstr: %v", err)
-	}
+}
+
+
+func main() {
+	DemoBytes()
+	DemoStrings()
 }
