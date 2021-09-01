@@ -12,7 +12,7 @@ func main() {
 
 	// 1. +=
 	s := time.Now()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100000; i++ {
 		str += city
 	}
 	e := time.Since(s)
@@ -22,7 +22,7 @@ func main() {
 	str = "chinese"
 	city = "beijing"
 	s = time.Now()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100000; i++ {
 		str = fmt.Sprintf("%s%s", str, city)
 	}
 	e = time.Since(s)
@@ -34,7 +34,7 @@ func main() {
 	s = time.Now()
 	var buf = bytes.Buffer{}
 	buf.WriteString(str)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100000; i++ {
 		buf.WriteString(city)
 	}
 	e = time.Since(s)
@@ -46,11 +46,11 @@ func main() {
 	s = time.Now()
 	bstr := []byte(str)
 	bcity := []byte(city)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100000; i++ {
 		bstr = append(bstr, bcity...)
 	}
 	e = time.Since(s)
-	fmt.Printf("randstrs : %s", bstr)
+	// fmt.Printf("randstrs : %s", bstr)
 	fmt.Println("time cost 4:", e)
 
 	// 5. copy
@@ -58,12 +58,12 @@ func main() {
 	city = "beijing"
 	s = time.Now()
 	zstr := []byte(str)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100000; i++ {
 		copy(zstr, city)
 	}
 	e = time.Since(s)
-	fmt.Printf("randstrs : %s", zstr)
-	fmt.Printf("randstrs : %s", city)
+	// fmt.Printf("randstrs : %s", zstr)
+	// fmt.Printf("randstrs : %s", city)
 	fmt.Println("time cost 5:", e)
 
 	hello := "hello"
@@ -78,5 +78,5 @@ func main() {
         _= buffer.String()
 
     }
-	fmt.Printf("buffer : %s", buffer.String())
+	// fmt.Printf("buffer : %s", buffer.String())
 }

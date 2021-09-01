@@ -21,24 +21,23 @@ func DemoStrings() {
 	builder1.WriteString("hello")
 	// fmt.Printf("The length 0f builder1: %d\n", builder1.Len())
 	builder1.WriteByte(' ')
-	builder1.WriteString("world !")
-	builder1.Write([]byte{'\n'})
+	builder1.WriteString("world")
+	builder1.Write([]byte{' ', '!'})
 
-	fmt.Println(builder1.String())
-	fmt.Printf("%T",builder1.String())
-	// builder1.Reset()
-	// fmt.Println(builder1.String())
+	fmt.Println(builder1.String())	
 
 	f1 := func(b strings.Builder) {
-		// b.WriteString("world !")
-		// fmt.Println(b.String())
+		// b.WriteString("world !")  //会报错
 	}
 	f1(builder1)
+
+	builder1.Reset()
+	fmt.Printf("The length 0f builder1: %d\n", builder1.Len())
 
 }
 
 
 func main() {
-	DemoBytes()
+	// DemoBytes()
 	DemoStrings()
 }
