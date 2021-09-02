@@ -1,4 +1,4 @@
-package string
+package benchmark
 
 import (
 	"bytes"
@@ -34,17 +34,17 @@ func DemoPlus(n int) {
 	}
 }
 
-// func BenchmarkDemoBytes(b *testing.B) {
-// 	for i := 0; i < b.N; i++ {
-// 		DemoBytes(10000)
-// 	}
-// }
+func BenchmarkDemoBytes(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		DemoBytes(10000)
+	}
+}
 
-// func BenchmarkDemoStrings(b *testing.B) {
-// 	for i := 0; i < b.N; i++ {
-// 		DemoStrings(10000)
-// 	}
-// }
+func BenchmarkDemoStrings(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		DemoStrings(10000)
+	}
+}
 
 func BenchmarkDemoPlus(b *testing.B) {
 	for i := 0; i < b.N; i++ {
