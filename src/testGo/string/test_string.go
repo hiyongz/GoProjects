@@ -1,82 +1,18 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"time"
 )
 
 func main() {
-	str := "chinese"
-	city := "beijing"
+	str := "你好world"
+	fmt.Printf("The string: %q\n", str)
+	fmt.Printf("runes(char): %q\n", []rune(str))
+	fmt.Printf("runes(hex): %x\n", []rune(str))
+	fmt.Printf("bytes(hex): [% x]\n", []byte(str))
 
-	// 1. +=
-	s := time.Now()
-	for i := 0; i < 100000; i++ {
-		str += city
+	for i, c := range str {
+		fmt.Printf("%d: %q [% x]\n", i, c, []byte(string(c)))
 	}
-	e := time.Since(s)
-	fmt.Println("time cost 1:", e)
-
-	// 2. fmt.Sprintf
-	str = "chinese"
-	city = "beijing"
-	s = time.Now()
-	for i := 0; i < 100000; i++ {
-		str = fmt.Sprintf("%s%s", str, city)
-	}
-	e = time.Since(s)
-	fmt.Println("time cost 2:", e)
-
-	//3.  buffer.WriteString
-	str = "chinese"
-	city = "beijing"
-	s = time.Now()
-	var buf = bytes.Buffer{}
-	buf.WriteString(str)
-	for i := 0; i < 100000; i++ {
-		buf.WriteString(city)
-	}
-	e = time.Since(s)
-	fmt.Println("time cost 3:", e)
-
-	//4. append
-	str = "chinese"
-	city = "beijing"
-	s = time.Now()
-	bstr := []byte(str)
-	bcity := []byte(city)
-	for i := 0; i < 100000; i++ {
-		bstr = append(bstr, bcity...)
-	}
-	e = time.Since(s)
-	// fmt.Printf("randstrs : %s", bstr)
-	fmt.Println("time cost 4:", e)
-
-	// 5. copy
-	str = "chinese"
-	city = "beijing"
-	s = time.Now()
-	zstr := []byte(str)
-	for i := 0; i < 100000; i++ {
-		copy(zstr, city)
-	}
-	e = time.Since(s)
-	// fmt.Printf("randstrs : %s", zstr)
-	// fmt.Printf("randstrs : %s", city)
-	fmt.Println("time cost 5:", e)
-
-	hello := "hello"
-    world := "world"
-
-	var buffer bytes.Buffer
-    for i := 0; i < 10; i++ {
-        
-        buffer.WriteString(hello)
-        buffer.WriteString(",")
-        buffer.WriteString(world)
-        _= buffer.String()
-
-    }
-	// fmt.Printf("buffer : %s", buffer.String())
 }
+
