@@ -3,11 +3,23 @@ package main
 import "fmt"
 
 func main() {
-	ch1 := make(chan int, 3)
-	ch1 <- 2
-	ch1 <- 1
-	ch1 <- 3
-	elem1 := <-ch1
-	fmt.Printf("The first element received from channel ch1: %v\n",
-		elem1)
+
+	str1 := []string{"hello","world", "!"}
+	ch1 := make(chan string, len(str1))
+
+	for _, str := range str1 {
+		ch1 <- str
+	}
+
+	ch1 <- "123"
+
+	for i := 0; i < len(str1); i++ {
+		elem := <- ch1
+		fmt.Println(elem)
+	}
+
+	ch1 <- "123"
+
+
+
 }
