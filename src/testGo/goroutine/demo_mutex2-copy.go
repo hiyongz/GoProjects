@@ -23,10 +23,12 @@ func deposit(value int, wg *sync.WaitGroup) {
 }
 
 func withdraw(value int, wg *sync.WaitGroup) {
+    // mutex.Lock()
     mutex.Lock()
     fmt.Printf("Withdrawing %d from account with balance: %d\n", value, balance)
     balance -= value
     mutex.Unlock()
+    // mutex.Unlock()
     wg.Done()
 }
 

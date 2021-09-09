@@ -23,6 +23,7 @@ func deposit(value int) {
 
     if protecting == 1 {
         mutex.Lock()
+        mutex.Lock()
         defer mutex.Unlock()
     }
 
