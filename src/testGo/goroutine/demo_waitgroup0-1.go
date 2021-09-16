@@ -5,7 +5,7 @@ import (
 	"fmt"
 	// "math/rand"
 	"sync"
-	// "time"
+	"time"
 )
 
 var (
@@ -39,8 +39,7 @@ func withdraw(value int) {
         mutex.Lock()
         defer mutex.Unlock()
     }
-    // waitTime := rand.Intn(3)
-    // time.Sleep(time.Duration(waitTime) * time.Second)
+
     fmt.Printf("余额: %d\n", balance)
     balance -= value
     fmt.Printf("取 %d 后的余额: %d\n", value, balance)
@@ -49,10 +48,17 @@ func withdraw(value int) {
 
 func main() {
 	// var wg sync.WaitGroup
-	wg.Add(10)
+	wg.Add(5)
+    for i:=0; i < 5; i++ {
+        go deposit(500)  // 存500
+    }
+    wg.Wait()
+
+    time.Sleep(time.Duration(3) * time.Second)
+    
+    wg.Add(5)
     for i:=0; i < 5; i++ {
         go withdraw(500) // 取500
-        go deposit(500)  // 存500
     }
     wg.Wait()
 
