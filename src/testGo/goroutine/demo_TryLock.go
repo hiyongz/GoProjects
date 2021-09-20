@@ -15,8 +15,7 @@ var (
 
 // 存钱
 func deposit(value int32) {
-	for {
-		
+	for {		
 		fmt.Printf("余额: %d\n", balance)
 		atomic.AddInt32(&balance, value)
 		fmt.Printf("存 %d 后的余额: %d\n", value, balance)
